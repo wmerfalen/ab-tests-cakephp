@@ -22,6 +22,8 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\View\Exception\MissingTemplateException;
 
+use App\Model\Table\ConversionTable;
+
 /**
  * Static content controller
  *
@@ -59,9 +61,15 @@ class PagesController extends AppController
         if (!empty($path[1])) {
             $subpage = $path[1];
         }
+
         $this->set(compact('page', 'subpage'));
+        $this->set('color', $this->decide_color());
 
         try {
+            /**
+             * If url is server.com/pages/a/bcd, 
+             * implode('/', $path) will be 'a/bcd'
+             */
             return $this->render(implode('/', $path));
         } catch (MissingTemplateException $exception) {
             if (Configure::read('debug')) {
@@ -69,5 +77,16 @@ class PagesController extends AppController
             }
             throw new NotFoundException();
         }
+    }
+
+    public function decide_color() : string {
+        if ((mt_rand() % 2) === 0) {
+            return 'blue';
+        }
+        return 'green';
+    }
+    public function conversion() : ?Response {
+        $c = new ConversionTable();
+        $c->save_conversion($_SERVER['REMOTE_ADDR'], $_GET['choice'] ?? null);
     }
 }
