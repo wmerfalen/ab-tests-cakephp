@@ -100,37 +100,14 @@ endif;
                 </div>
                 <div class="row">
                     <div class="column">
-                        <h4>Offer ends soon!</h4>
+                    <h4>You chose <?php echo h($color);?>! Here are some stats:</h4>
                         <ul>
-                        <?php if (version_compare(PHP_VERSION, '7.2.0', '>=')) : ?>
-                            <li class="bullet success">Your version of PHP is 7.2.0 or higher (detected <?= PHP_VERSION ?>).</li>
-                        <?php else : ?>
-                            <li class="bullet problem">Your version of PHP is too low. You need PHP 7.2.0 or higher to use CakePHP (detected <?= PHP_VERSION ?>).</li>
-                        <?php endif; ?>
-
-                        <?php if (extension_loaded('mbstring')) : ?>
-                            <li class="bullet success">Your version of PHP has the mbstring extension loaded.</li>
-                        <?php else : ?>
-                            <li class="bullet problem">Your version of PHP does NOT have the mbstring extension loaded.</li>
-                        <?php endif; ?>
-
-                        <?php if (extension_loaded('openssl')) : ?>
-                            <li class="bullet success">Your version of PHP has the openssl extension loaded.</li>
-                        <?php elseif (extension_loaded('mcrypt')) : ?>
-                            <li class="bullet success">Your version of PHP has the mcrypt extension loaded.</li>
-                        <?php else : ?>
-                            <li class="bullet problem">Your version of PHP does NOT have the openssl or mcrypt extension loaded.</li>
-                        <?php endif; ?>
-
-                        <?php if (extension_loaded('intl')) : ?>
-                            <li class="bullet success">Your version of PHP has the intl extension loaded.</li>
-                        <?php else : ?>
-                            <li class="bullet problem">Your version of PHP does NOT have the intl extension loaded.</li>
-                        <?php endif; ?>
+                        <li class="bullet success"><?php echo h($blue_visitors);?> visitors have chosen Blue</li>
+                        <li class="bullet success"><?php echo h($green_visitors);?> visitors have chosen Green</li>
+                        <li class="bullet success">In total, there have been <?php echo h($visitor_count);?> visitors to the CTA page (the page you just came from).</li>
+                        <li class="bullet success">In total, you account for <?php echo h($client_traffic_percentage);?> of our traffic to that page.</li>
+                        <li class="bullet success">There have been <?php echo h($total_visits);?> visits to that page.</li>
                         </ul>
-                        <a href="/conversion?choice=<?php echo h($color);?>">
-                            <button style="background-color: <?php echo h($color);?>;">Sign me up!</button>
-                        </a>
                     </div>
                 </div>
             </div>
