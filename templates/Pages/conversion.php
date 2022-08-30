@@ -22,31 +22,6 @@ use Cake\Http\Exception\NotFoundException;
 
 $this->disableAutoLayout();
 
-$checkConnection = function (string $name) {
-    $error = null;
-    $connected = false;
-    try {
-        $connection = ConnectionManager::get($name);
-        $connected = $connection->connect();
-    } catch (Exception $connectionError) {
-        $error = $connectionError->getMessage();
-        if (method_exists($connectionError, 'getAttributes')) {
-            $attributes = $connectionError->getAttributes();
-            if (isset($attributes['message'])) {
-                $error .= '<br />' . $attributes['message'];
-            }
-        }
-    }
-
-    return compact('connected', 'error');
-};
-
-if (!Configure::read('debug')) :
-    throw new NotFoundException(
-        'Please replace templates/Pages/home.php with your own version or re-enable debug mode.'
-    );
-endif;
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -70,11 +45,8 @@ endif;
 <body>
     <header>
         <div class="container text-center">
-            <a href="https://cakephp.org/" target="_blank" rel="noopener">
-                <img alt="CakePHP" src="https://cakephp.org/v2/img/logos/CakePHP_Logo.svg" width="350" />
-            </a>
             <h1>
-                Welcome to CakePHP <?= h(Configure::version()) ?> Strawberry (🍓)
+                Welcome to the A/B testing system
             </h1>
         </div>
     </header>
@@ -83,30 +55,13 @@ endif;
             <div class="content">
                 <div class="row">
                     <div class="column">
-                        <div class="message default text-center">
-                            <small>Please be aware that this page will not be shown if you turn off debug mode unless you replace templates/Pages/home.php with your own version.</small>
-                        </div>
-                        <div id="url-rewriting-warning" style="padding: 1rem; background: #fcebea; color: #cc1f1a; border-color: #ef5753;">
-                            <ul>
-                                <li class="bullet problem">
-                                    URL rewriting is not properly configured on your server.<br />
-                                    1) <a target="_blank" rel="noopener" href="https://book.cakephp.org/4/en/installation.html#url-rewriting">Help me configure it</a><br />
-                                    2) <a target="_blank" rel="noopener" href="https://book.cakephp.org/4/en/development/configuration.html#general-configuration">I don't / can't use URL rewriting</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <?php Debugger::checkSecurityKeys(); ?>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
                     <h4>You chose <?php echo h($color);?>! Here are some stats:</h4>
                         <ul>
-                        <li class="bullet success"><?php echo h($blue_visitors);?> visitors have chosen Blue</li>
-                        <li class="bullet success"><?php echo h($green_visitors);?> visitors have chosen Green</li>
-                        <li class="bullet success">In total, there have been <?php echo h($visitor_count);?> visitors to the CTA page (the page you just came from).</li>
-                        <li class="bullet success">In total, you account for <?php echo h($client_traffic_percentage);?> of our traffic to that page.</li>
-                        <li class="bullet success">There have been <?php echo h($total_visits);?> visits to that page.</li>
+                        <li class="bullet success"><?php echo h($stats['blue_visitors']);?> visitor(s) have chosen Blue</li>
+                        <li class="bullet success"><?php echo h($stats['green_visitors']);?> visitor(s) have chosen Green</li>
+                        <li class="bullet success">In total, there have been <?php echo h($stats['unique_visitors']);?> unique visitor(s) to the CTA page (the page you just came from).</li>
+                        <li class="bullet success">In total, you account for <?php echo h($stats['client_traffic_percentage']);?>% of our traffic to that page.</li>
+                        <li class="bullet success">There have been <?php echo h($stats['total_visits']);?> visits to that page.</li>
                         </ul>
                     </div>
                 </div>

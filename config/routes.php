@@ -59,6 +59,7 @@ return static function (RouteBuilder $routes) {
 
         $builder->connect('/conversion',['controller' => 'Pages', 'action' => 'conversion']);
 
+        $builder->connect('/get-new-test', ['controller' => 'Pages', 'action' => 'new_test']);
         /*
          * Connect catchall routes for all controllers.
          *

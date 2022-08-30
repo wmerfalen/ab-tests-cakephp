@@ -37,6 +37,8 @@ use App\Model\Table\ControlSwitchTable;
 */
 class PagesController extends AppController
 {
+    private static $test_A = 'blue';
+    private static $test_B = 'green';
     private const SALT = '63badbc773703c0850e69793f6def3b497492119fe4b477cf5d5c6bf72117be6149ec4fcb7bab78a6f7bcc5b8c2c9c1d6602b5850698841ae012ac9ab';
     public static function session_initialize()
     {
@@ -61,12 +63,22 @@ class PagesController extends AppController
 
     public function gather_stats(string $client_ip)
     {
+        $c = new VisitsTable();
+        $total_visits = $c->query()->count();
+        $unique_visitors = $c->query()->distinct('ip')->count();
+        $client_visits = $c->query()
+                                       ->where([
+                                           'ip' => $client_ip,
+                                       ])->count();
+        $client_traffic_percentage = floatval(($client_visits * 1.0) / ($total_visits * 1.0) * 100);
+        $client_traffic_percentage = round($client_traffic_percentage,2,PHP_ROUND_HALF_UP);
+
         return [
             'blue_visitors' => $this->get_conversions_by_test('blue'),
             'green_visitors' => $this->get_conversions_by_test('green'),
-            'visitor_count' => 0,
-            'client_traffic_percentage' => 0,
-            'total_visits' => 0,
+            'unique_visitors' => $unique_visitors,
+            'total_visits' => $total_visits,
+            'client_traffic_percentage' => $client_traffic_percentage,
         ];
     }
     /**
@@ -83,7 +95,6 @@ class PagesController extends AppController
     */
     public function display(string ...$path): ?Response
     {
-        dd($this->gather_stats($_SERVER['REMOTE_ADDR']));
         static::session_initialize();
         if (!$path) {
             return $this->redirect('/');
@@ -100,8 +111,10 @@ class PagesController extends AppController
             $subpage = $path[1];
         }
 
+        //dd(compact('page,subpage'));
         $this->set(compact('page', 'subpage'));
         $this->set('color', $this->decide_color());
+
 
         $this->log_visit($_SERVER['REMOTE_ADDR']);
 
@@ -117,6 +130,11 @@ class PagesController extends AppController
             }
             throw new NotFoundException();
         }
+    }
+
+    protected function sesh_unset($key)
+    {
+        return $this->request->getSession()->delete($key);
     }
 
     protected function sesh($key, $value = null)
@@ -179,7 +197,6 @@ class PagesController extends AppController
 
     public function conversion()
     {
-        $this->log_conversion($_SERVER['REMOTE_ADDR']);
         $c = new ConversionTable();
         $c->query()
             ->insert(['ip','choice','hash','created'])
@@ -194,6 +211,13 @@ class PagesController extends AppController
                 'created' => date('Y-m-d H:i:s'),
             ])->execute();
         $this->set('color', $this->decide_color());
+        $this->set('stats',$this->gather_stats($_SERVER['REMOTE_ADDR']));
+    }
+
+    public function newTest() {
+        $this->sesh_unset('color');
+        $this->decide_color();
+        $this->redirect('/');
     }
 
     protected function log_conversion(string $client)
